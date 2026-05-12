@@ -1,1 +1,56 @@
-Test
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Heap Sort</title>
+</head>
+<body>
+  <h2>Heap Sort em JavaScript</h2>
+  <button onclick="executar()">Executar ordenação</button>
+
+  <p id="saida"></p>
+
+  <script>
+    function heapify(lista, n, i) {
+      let maior = i;
+      let esquerda = 2 * i + 1;
+      let direita = 2 * i + 2;
+
+      if (esquerda < n && lista[esquerda] > lista[maior]) {
+        maior = esquerda;
+      }
+
+      if (direita < n && lista[direita] > lista[maior]) {
+        maior = direita;
+      }
+
+      if (maior !== i) {
+        [lista[i], lista[maior]] = [lista[maior], lista[i]];
+        heapify(lista, n, maior);
+      }
+    }
+
+    function heapSort(lista) {
+      let n = lista.length;
+
+      for (let i = Math.floor(n / 2 - 1); i >= 0; i--) {
+        heapify(lista, n, i);
+      }
+
+      for (let i = n - 1; i > 0; i--) {
+        [lista[0], lista[i]] = [lista[i], lista[0]];
+        heapify(lista, i, 0);
+      }
+
+      return lista;
+    }
+
+    function executar() {
+      let numeros = [4, 10, 3, 5, 1];
+      let resultado = heapSort(numeros);
+      document.getElementById("saida").innerText =
+        "Resultado: " + resultado.join(", ");
+    }
+  </script>
+</body>
+</html>
