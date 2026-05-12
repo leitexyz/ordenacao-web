@@ -2,55 +2,130 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Heap Sort</title>
+  <title>Heap Sort Animado</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 300px;
+      margin-top: 20px;
+      gap: 5px;
+    }
+
+    .bar {
+      width: 40px;
+      background: steelblue;
+      color: white;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      transition: 0.3s;
+    }
+
+    .active {
+      background: orange !important;
+    }
+
+    .sorted {
+      background: green !important;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Heap Sort em JavaScript</h2>
-  <button onclick="executar()">Executar ordenação</button>
 
-  <p id="saida"></p>
+<h2>Heap Sort Animado</h2>
 
-  <script>
-    function heapify(lista, n, i) {
-      let maior = i;
-      let esquerda = 2 * i + 1;
-      let direita = 2 * i + 2;
+<button onclick="start()">Iniciar</button>
 
-      if (esquerda < n && lista[esquerda] > lista[maior]) {
-        maior = esquerda;
-      }
+<div class="container" id="container"></div>
 
-      if (direita < n && lista[direita] > lista[maior]) {
-        maior = direita;
-      }
+<script>
+let array = [4, 10, 3, 5, 1];
+let container = document.getElementById("container");
 
-      if (maior !== i) {
-        [lista[i], lista[maior]] = [lista[maior], lista[i]];
-        heapify(lista, n, maior);
-      }
-    }
+function render(arr, active = [], sorted = []) {
+  container.innerHTML = "";
 
-    function heapSort(lista) {
-      let n = lista.length;
+  arr.forEach((value, i) => {
+    let div = document.createElement("div");
+    div.classList.add("bar");
 
-      for (let i = Math.floor(n / 2 - 1); i >= 0; i--) {
-        heapify(lista, n, i);
-      }
+    if (active.includes(i)) div.classList.add("active");
+    if (sorted.includes(i)) div.classList.add("sorted");
 
-      for (let i = n - 1; i > 0; i--) {
-        [lista[0], lista[i]] = [lista[i], lista[0]];
-        heapify(lista, i, 0);
-      }
+    div.style.height = value * 20 + "px";
+    div.innerText = value;
 
-      return lista;
-    }
+    container.appendChild(div);
+  });
+}
 
-    function executar() {
-      let numeros = [4, 10, 3, 5, 1];
-      let resultado = heapSort(numeros);
-      document.getElementById("saida").innerText =
-        "Resultado: " + resultado.join(", ");
-    }
-  </script>
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function heapify(arr, n, i, sorted) {
+  let maior = i;
+  let esquerda = 2 * i + 1;
+  let direita = 2 * i + 2;
+
+  render(arr, [i], sorted);
+  await sleep(500);
+
+  if (esquerda < n && arr[esquerda] > arr[maior]) {
+    maior = esquerda;
+  }
+
+  if (direita < n && arr[direita] > arr[maior]) {
+    maior = direita;
+  }
+
+  if (maior !== i) {
+    [arr[i], arr[maior]] = [arr[maior], arr[i]];
+    render(arr, [i, maior], sorted);
+    await sleep(500);
+
+    await heapify(arr, n, maior, sorted);
+  }
+}
+
+async function heapSort(arr) {
+  let n = arr.length;
+  let sorted = [];
+
+  for (let i = Math.floor(n / 2 - 1); i >= 0; i--) {
+    await heapify(arr, n, i, sorted);
+  }
+
+  for (let i = n - 1; i > 0; i--) {
+    [arr[0], arr[i]] = [arr[i], arr[0]];
+    sorted.push(i);
+
+    render(arr, [0, i], sorted);
+    await sleep(600);
+
+    await heapify(arr, i, 0, sorted);
+  }
+
+  sorted.push(0);
+  render(arr, [], sorted);
+}
+
+function start() {
+  heapSort([...array]);
+}
+
+// inicial
+render(array);
+</script>
+
 </body>
 </html>
